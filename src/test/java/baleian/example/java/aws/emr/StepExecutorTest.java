@@ -35,8 +35,8 @@ public class StepExecutorTest {
                 .withJar("command-runner.jar")
                 .withArgs("hive-script", "--run-hive-script", "--args",
                         "-f", "<HIVE_SCRIPT_PATH_URI>",
-                        "-d", "<SCRIPT_VALUE_NAME1>=<<SCRIPT_VALUE1>",  // it will replace ${<SCRIPT_VALUE_NAME>} to <SCRIPT_VALUE> into hive script.
-                        "-d", "<SCRIPT_VALUE_NAME2>=<<SCRIPT_VALUE2>");
+                        "-d", "<SCRIPT_VALUE_NAME1>=<SCRIPT_VALUE1>",  // it will replace ${<SCRIPT_VALUE_NAME>} to <SCRIPT_VALUE> into hive script.
+                        "-d", "<SCRIPT_VALUE_NAME2>=<SCRIPT_VALUE2>");
         StepConfig hiveStepConfig = new StepConfig("<HIVE_STEP_NAME>", commandRunnerJarStepConfig).withActionOnFailure(ActionOnFailure.CANCEL_AND_WAIT);
 
 
