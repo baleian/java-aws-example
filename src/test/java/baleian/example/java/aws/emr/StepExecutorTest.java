@@ -21,17 +21,23 @@ public class StepExecutorTest {
                 .withRegion("<AWS_REGION>")
                 .build();
 
-        // A custom step
+        
+        // A custom jar step
         HadoopJarStepConfig hadoopJarStepConfig = new HadoopJarStepConfig()
-                .withJar("s3://<BUCKET_NAME>/<JAR_PATH>")
+                .withJar("<JAR_PATH_URI>")
                 .withMainClass("<MAIN_CLASS_PATH>") // optional main class, this can be omitted if jar above has a manifest
                 .withArgs("<ARG1>", "<ARG2>..."); // optional list of arguments
         StepConfig hadoopStepConfig = new StepConfig("<HADOOP_STEP_NAME>", hadoopJarStepConfig).withActionOnFailure(ActionOnFailure.CONTINUE);
 
-        StepConfig hiveStepConfig = new StepConfig("<HIVE_STEP_NAME>", new StepFactory("<AWS_REGION>.elasticmapreduce")
-                .newRunHiveScriptStep("s3://<SCRIPT_PATH>")
-                .withProperties(new KeyValue("<PROPERTY_KEY1>", "<PROPERTY_VALUE1>"), new KeyValue("<PROPERTY_KEY2>", "<PROPERTY_VALUE2>"))
-        ).withActionOnFailure(ActionOnFailure.TERMINATE_JOB_FLOW);
+        
+        // A hive script runner step
+        HadoopJarStepConfig commandRunnerJarStepConfig = new HadoopJarStepConfig()
+                .withJar("command-runner.jar")
+                .withArgs("hive-script", "--run-hive-script", "--args",
+                        "-f", "<HIVE_SCRIPT_PATH_URI>",
+                        "-d", "<SCRIPT_VALUE_NAME1>=<<SCRIPT_VALUE1>",  // it will replace ${<SCRIPT_VALUE_NAME>} to <SCRIPT_VALUE> into hive script.
+                        "-d", "<SCRIPT_VALUE_NAME2>=<<SCRIPT_VALUE2>");
+        StepConfig hiveStepConfig = new StepConfig("<HIVE_STEP_NAME>", commandRunnerJarStepConfig).withActionOnFailure(ActionOnFailure.CANCEL_AND_WAIT);
 
 
         // if you want to run at temporary cluster
@@ -48,10 +54,11 @@ public class StepExecutorTest {
 //        clusterConfig.setInstanceCount(3);
 //        clusterConfig.setMasterInstanceType("m4.large");
 //        clusterConfig.setSlaveInstanceType("m4.large");
-//        clusterConfig.setEmrManagedMasterSecurityGroup("sg-3152f15a");
-//        clusterConfig.setEmrManagedSlaveSecurityGroup("sg-0a53f061");
-//        clusterConfig.setEc2SubnetId("subnet-0610b56e");
+//        clusterConfig.setEmrManagedMasterSecurityGroup("<MASTER_SECURITY_GROUP_ID>"); // sg-xxxxxxxx
+//        clusterConfig.setEmrManagedSlaveSecurityGroup("<SLAVE_SECURITY_GROUP_ID>"); // sg-xxxxxxxx
+//        clusterConfig.setEc2SubnetId("<EC2_SUBNET_ID>"); // subnet-xxxxxxxx
 
+        
         // if you already have running cluster
         String clusterId = "<CLUSTER_ID>";
 
