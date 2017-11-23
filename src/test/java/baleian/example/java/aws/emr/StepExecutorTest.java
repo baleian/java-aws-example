@@ -5,8 +5,10 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
-import com.amazonaws.services.elasticmapreduce.model.*;
-import com.amazonaws.services.elasticmapreduce.util.StepFactory;
+import com.amazonaws.services.elasticmapreduce.model.ActionOnFailure;
+import com.amazonaws.services.elasticmapreduce.model.HadoopJarStepConfig;
+import com.amazonaws.services.elasticmapreduce.model.Step;
+import com.amazonaws.services.elasticmapreduce.model.StepConfig;
 
 import java.util.Arrays;
 import java.util.List;
