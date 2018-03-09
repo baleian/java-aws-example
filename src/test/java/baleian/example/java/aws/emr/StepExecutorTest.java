@@ -5,10 +5,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduce;
 import com.amazonaws.services.elasticmapreduce.AmazonElasticMapReduceClientBuilder;
-import com.amazonaws.services.elasticmapreduce.model.ActionOnFailure;
-import com.amazonaws.services.elasticmapreduce.model.HadoopJarStepConfig;
-import com.amazonaws.services.elasticmapreduce.model.Step;
-import com.amazonaws.services.elasticmapreduce.model.StepConfig;
+import com.amazonaws.services.elasticmapreduce.model.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,7 +13,53 @@ import java.util.List;
 public class StepExecutorTest {
 
     public static void main(String[] args) {
+
         AWSCredentials credentials = new BasicAWSCredentials("<AWS_ACCESS_KEY_ID>", "<AWS_SECRET_ACCESS_KEY>");
+
+        EmrCluster cluster = new EmrClusterBuilder()
+                .withCredentials(credentials)
+                .withRegion("<AWS_REGION>")
+                .withClusterId("<EMR_CLUSTER_ID>")
+                .build();
+
+//        String clusterId = cluster.create(new RunJobFlowRequest());
+//        boolean isTerminating = cluster.terminate();
+
+
+        CustomJarStepConfig customJarStepConfig = CustomJarStepConfig.builder()
+                .withStepName("<STEP_NAME>")
+                .withJarUri("<JAR_PATH_URI>")
+                .withMainClass("<MAIN_CLASS_PATH")
+                .withArgs("<SCRIPT_VALUE_NAME1>=<SCRIPT_VALUE1>", "<SCRIPT_VALUE_NAME2>=<SCRIPT_VALUE2>")
+                .withActionOnFailure(ActionOnFailure.CONTINUE)
+                .build();
+
+        HiveStepConfig hiveStepConfig = HiveStepConfig.builder()
+                .withStepName("<STEP_NAME>")
+                .withScriptUri("<HIVE_SCRIPT_PATH_URI>")
+                .withArgs("<SCRIPT_VALUE_NAME1>=<SCRIPT_VALUE1>", "<SCRIPT_VALUE_NAME2>=<SCRIPT_VALUE2>")
+                .withActionOnFailure(ActionOnFailure.CONTINUE)
+                .build();
+
+        EmrResult result = cluster
+                .request(customJarStepConfig, hiveStepConfig)
+                .withOnBeforeStep(stepRequest -> {})
+                .withOnAfterStep(step -> {})
+                .execute();
+
+        String[] stepIds = cluster
+                .request(customJarStepConfig, hiveStepConfig)
+                .withOnBeforeStep(stepRequest -> {})
+                .withOnAfterStep(step -> {})
+                .async()
+                .withOnSuccess(result -> {})
+                .withOnFailure(result -> {})
+                .withOnError(e -> {})
+                .execute();
+
+
+
+
 
         AmazonElasticMapReduce client = AmazonElasticMapReduceClientBuilder.standard()
                 .withCredentials(new AWSStaticCredentialsProvider(credentials))
